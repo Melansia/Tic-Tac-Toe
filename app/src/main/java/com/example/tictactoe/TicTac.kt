@@ -1,32 +1,89 @@
 package com.example.tictactoe
 
+import java.util.*
 import kotlin.math.abs
 
 fun main() {
+
     print("Enter cells: ")
-    var inpStr = ""
-    do {
-        inpStr = readln()
-    } while (inpStr.length != 9)
-    if (inpStr.length == 9) {
-        fieldPrint(inpStr)
-        check(inpStr)
-    }
-}
-
-fun fieldPrint(str: String) {
-
-    var str = str.replace("_" , " ")
-
-    println(
-        """
-    ---------        
-    | ${str[0]} ${str[1]} ${str[2]} |
-    | ${str[3]} ${str[4]} ${str[5]} |
-    | ${str[6]} ${str[7]} ${str[8]} |
-    ---------""".trimIndent()
+    val board = readln().replace("_", " ")
+    val grid = arrayOf(
+        arrayOf(board[0], board[1], board[2]),
+        arrayOf(board[3], board[4], board[5]),
+        arrayOf(board[6], board[7], board[8]),
     )
+    fieldPrint(grid)
+
+    var coords = gettingCords()
+
+    var switch = true
+    while (switch) {
+        if (grid[coords[0]][coords[1]] != ' ') {
+            println("This cell is occupied! Choose another one!")
+            coords = gettingCords()
+        } else {
+            grid[coords[0]][coords[1]] = 'X'
+            fieldPrint(grid)
+            switch = false
+        }
+    }
+    check(arrToString(grid))
+    fieldPrint(grid)
 }
+
+
+fun fieldPrint(mutList: Array<Array<Char>>) {
+    println("-".repeat(9))
+    mutList.forEach { println("| ${it.joinToString(" ")} |") }
+    println("-".repeat(9))
+}
+
+fun arrToString(grid: Array<Array<Char>>): String{
+    var result = ""
+    for (i in grid.indices)
+    {
+        var j = 0
+        while (j < grid[i]?.size)
+        {
+            result+= grid[i][j].toString()
+            j++
+        }
+    }
+    return result
+}
+
+fun isNumeric(toCheck: String): Boolean {
+    val regex = "-?[0-9]+(\\.[0-9]+)?".toRegex()
+    return toCheck.matches(regex)
+}
+
+fun gettingCords(): List<Int> {
+    val scanner = Scanner(System.`in`)
+    var switch = true
+
+    var long = 0
+    var lat = 0
+
+    do {
+        print("Enter the coordinates: ")
+        val coords = scanner.nextLine().split(" ")
+        if (isNumeric(coords[0]) && isNumeric(coords[1])) {
+            if (coords[0].toInt() > 3 || coords[1].toInt() > 3) {
+                println("Coordinates should be from 1 to 3!")
+            } else if (coords[0].toInt() <= 3 && coords[1].toInt() <= 3) {
+                long = coords[0].toInt() - 1
+                lat = coords[1].toInt() - 1
+                switch = false
+            }
+        } else {
+            println("You should enter numbers!")
+        }
+    } while (switch)
+
+    val result = listOf(long, lat)
+    return result
+}
+
 
 fun check(str: String) {
     val winsPositions = listOf(
